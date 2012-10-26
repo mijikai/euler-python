@@ -43,3 +43,4 @@ $RECYCLE.BIN/
 .*.sw[a-z]
 *.un~
 Session.vim
+.viminfo
