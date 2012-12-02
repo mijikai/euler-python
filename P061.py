@@ -12,7 +12,19 @@ def inverse_polygonal_number(s, N):
     return ((s - 2) + sqrt(s * s + (8 * N - 4) * s + 4)) / (2 * s)
 
 
-def traverse(head, graph, sides, res):
+def traverse(graph, sides):
+    subgraph = graph[sides[0]]
+    rest_sides = sides[1:]
+    for head in subgraph.keys():
+        tails = subgraph[head]
+        for t in tails:
+            num = head * 100 + t
+            for sol in traverse_helper(t, graph, rest_sides, (num,)):
+                if sol[-1] % 100 == head:
+                    yield sol
+
+
+def traverse_helper(head, graph, sides, res):
     if not sides:
         yield res
 
@@ -29,7 +41,7 @@ def traverse(head, graph, sides, res):
             num = head * 100 + tail
             if num in res:
                 continue
-            for ret in traverse(tail, graph, sides_list, res + (num,)):
+            for ret in traverse_helper(tail, graph, sides_list, res + (num,)):
                 yield ret
 
 
@@ -50,12 +62,5 @@ for i, seq in zip(sides, pol_nums_split):
         subgraph.setdefault(init, [])
         subgraph[init].append(final)
 
-solution_sets = set()
-for head in graph_pol[sides[0]].keys():
-    ret = traverse(head, graph_pol, sides, ())
-    for candidates in ret:
-        if candidates[-1] % 100 == head:
-            solution_sets.add(frozenset(candidates))
-
-for sol in solution_sets:
+for sol in traverse(graph_pol, sides):
     print(sum(sol), sol)
